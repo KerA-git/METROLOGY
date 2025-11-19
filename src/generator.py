@@ -233,8 +233,11 @@ class GeneratorCube:
 
         # Mise à jour des particules
         alive_particles = []
+        p : Particle
         for p in self.particles:
             p.update(dt)
+            if np.linalg.norm(p.position[0]) > self.max_range and p.position[0][0]<6:
+                print("Trouve")
             if np.linalg.norm(p.position[0]) <= self.max_range:
                 alive_particles.append(p)
             else:
