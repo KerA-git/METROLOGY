@@ -26,7 +26,21 @@ _end_time = time.perf_counter()
 sim_time = (_end_time - _start_time ) * time_scale
 print(f"\nSimulation finished in {sim_time :.4f} seconds\n")
 
-analysis = StaticAnalysisExtraction(sim_time , sensor , generator)
+data = StaticAnalysisExtraction(sim_time , sensor , generator)
 # Static analysis : - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-print(analysis)
+print(data)
+
+####################################################################################################################################################################################
+
+# estimation :
+
+from src.estimators.LittleLaw import LittleLawEstimator
+
+estimator = LittleLawEstimator()
+print("Real particle rate (λ) =", generator.emit_distribution.mean()**-1 , "particles/s")
+
+print("\n--- Little's Law Estimation ---")
+residence_times = data.estimate_residence_times()    # vecteur (N,)     
+occupation_counts = data.occupation_array()   # times: vecteur d'échantillonnage, occupation_counts: vecteur d'entiers
+print(f"Estimate particle rate : {estimator(occupation_counts, residence_times) :.4f} particles/s")

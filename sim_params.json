@@ -1,0 +1,24 @@
+{
+  "clock": 60,
+  "run_duration": 10.0,
+
+  "gen_radius": 0.5,
+  "gen_alpha": 20,
+  "gen_emission_rate": 10,
+
+  "gen_pos_dist_type": "uniform",
+  "gen_pos_dist_params": { "loc": 0.0, "scale": 1.0 },
+
+  "gen_vel_norm_dist_type": "constant",
+  "gen_vel_norm_dist_params": { "value": 1.0 },
+
+  "gen_vel_dir_dist_type": "uniform_cone",
+  "gen_vel_dir_dist_params": null,
+
+  "gen_emit_dist_type": "constant",
+  "gen_emit_dist_params": { "value": 0.5 },
+
+  "sen_pos": [3.0, 0.0, 0.0],
+  "sen_dimensions": [1.0, 3.0, 0.5],
+  "sen_fs": 1000.0
+}
