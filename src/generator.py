@@ -72,7 +72,7 @@ class GeneratorCube:
                 width=L,
                 height=L,
                 direction='+x',
-                color=(0.40, 0.25, 0.10, 1.0),
+                color=(0.15, 0.10, 0.08, 1.0),
                 parent=parent
             )
 
@@ -81,7 +81,7 @@ class GeneratorCube:
             self.emission_surface = scene.visuals.Ellipse(
                 center=(0, 0),
                 radius=L/2,
-                color=(0.40, 0.25, 0.10, 1.0),
+                color=(0.15, 0.10, 0.08, 1.0),
                 border_width=0,
                 parent=parent
             )

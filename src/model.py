@@ -12,7 +12,7 @@ from .capteur import Sensor
 # MODEL
 # -------------------------------------------------------------------
 
-def create_model(**params):
+def create_model(time_scale=1.0,**params):
 
     # ---------------------------
     # separation of parameters
@@ -52,7 +52,7 @@ def create_model(**params):
     view.camera.center = (2.5, 0, 0)   # moves the entire scene towards +X
 
     # Axes : creates XYZ axes and attach to the view
-    axis = scene.visuals.XYZAxis(parent=view.scene)
+    scene.visuals.XYZAxis(parent=view.scene)
     # Create generator cube and sensor ----------------------------------------------
 
     generator = GeneratorCube(
@@ -64,26 +64,39 @@ def create_model(**params):
          **sensor_params
     )
 
-    # Timer -----------------------------------------------------------
+    # Update -----------------------------------------------------------
 
     last_time = None
+    sim_time = None
 
     def update(ev):
-        nonlocal last_time
+        nonlocal last_time, sim_time
         # First frame init
         if last_time is None:
             last_time = ev.elapsed
+            sim_time = ev.elapsed
             return
-        dt = ev.elapsed - last_time
-        last_time = ev.elapsed
 
-        generator.update(dt, view.scene)
+        # real time elapsed since last frame
+        real_dt = ev.elapsed - last_time
+        # simulation time scaled by time_scale
+        sim_dt = real_dt * time_scale
+
+        # advance times
+        last_time = ev.elapsed
+        sim_time += sim_dt
+
+        # update generator with scaled simulation delta
+        generator.update(sim_dt, view.scene)
 
         # --- particle detect ---
         for p in generator.particles:
-            if sensor.detect(p, ev.elapsed):
-                sensor.record(p, ev.elapsed)
-                p.set_color((0, 1, 0, 1))  # Green
+            if sensor.detect(p, sim_time):
+                print(f"Particle detected at time {sim_time:.4f} s")
+                sensor.record(p, sim_time)
+                p.set_color((0, 1, 0, 1))
+            elif p.id in sensor.particle_seen:
+                p.set_color((0, 1, 0, 1))
 
     timer = app.Timer(interval=1/60, # ren frq (Hz)
                     connect=update, # call the update function each tick

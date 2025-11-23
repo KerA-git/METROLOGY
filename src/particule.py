@@ -13,7 +13,13 @@ def depth_color(d):
 ####################################################################################################################################
 
 class Particle:
-    def __init__(self, position, velocity, parent=None):
+    
+    id_counter = 0 # facilate unique ID assignment. maybe not a good idea in this context but suficient for small scale simulation.
+
+    def __init__(self, position, velocity, parent=None):    
+        # unique ID : 
+        self.id = Particle.id_counter
+        Particle.id_counter += 1
         self.position = np.array(position, float)[np.newaxis, :]
         self.velocity = np.array(velocity, float)[np.newaxis, :]
 

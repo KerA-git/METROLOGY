@@ -2,6 +2,8 @@
 
 from . import *
 
+from typing import List
+
 ####################################################################################################################################################################
 
 class Sensor:
@@ -49,6 +51,7 @@ class Sensor:
 
         # --- detection records ----------------------------------------------------
         self.records = []
+        self.particle_seen : List[int] = []  # IDs of particles already detected.
 
     ####################################################################################################
     #                                           VISUALISATION
@@ -107,7 +110,8 @@ class Sensor:
 
     def detect(self, particle, t):
         """Returns True if particle is inside the measurement volume at time t."""
-
+        if particle.id in self.particle_seen:
+            return False  # already detected
         # ---- Temporal sampling ----
         if t < self.next_sample_time:
             return False
@@ -139,6 +143,7 @@ class Sensor:
     ####################################################################################################
 
     def record(self, particle, t):
+        self.particle_seen.append(particle.id)
         self.records.append({
             't': t,
             'pos': particle.position.copy(),
