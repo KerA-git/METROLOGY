@@ -3,20 +3,21 @@
   "run_duration": 10.0,
 
   "gen_radius": 0.5,
-  "gen_alpha": 20,
+  "gen_alpha": 10,
   "gen_emission_rate": 10,
 
   "gen_pos_dist_type": "uniform",
-  "gen_pos_dist_params": { "loc": 0.0, "scale": 1.0 },
+  "gen_pos_dist_params": { "loc": 0.0, "scale": 0.5 },
 
   "gen_vel_norm_dist_type": "constant",
-  "gen_vel_norm_dist_params": { "value": 1.0 },
+  "gen_vel_norm_dist_params": { "value": 1.0 }, 
 
   "gen_vel_dir_dist_type": "uniform_cone",
-  "gen_vel_dir_dist_params": null,
+  "gen_vel_dir_dist_params": { "loc": 0, "scale": 0.058 },
 
-  "gen_emit_dist_type": "constant",
-  "gen_emit_dist_params": { "value": 0.5 },
+  "gen_emit_dist_type": "expon",
+
+  "gen_emit_dist_params": { "scale": 0.1 },
 
   "sen_pos": [3.0, 0.0, 0.0],
   "sen_dimensions": [1.0, 3.0, 0.5],

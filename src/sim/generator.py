@@ -69,23 +69,50 @@ class GeneratorCircle:
         dist_class = getattr(stats, vel_norm_dist_type)
         self.vel_norm_distribution = dist_class(**vel_norm_dist_params)
 
-    def _dist_vel_direction_uniform_cone( self ):
-        u = np.random.rand()
-        cos_theta = 1 - u * (1 - np.cos(self.alpha))
-        theta = np.arccos(cos_theta)
+    def _dist_vel_direction_uniform_cone(self):
+        # cos(theta) uniforme dans [cos(alpha), 1]
+        alpha_rad = np.deg2rad(self.alpha)
+        u = np.random.uniform(np.cos(alpha_rad), 1.0)
+        theta = np.arccos(u)
+        # phi uniforme dans [0, 2pi]
+        phi = 2 * np.pi * np.random.rand()
 
+        # direction dans repère x-y-z
+        dx = u
+        dy = np.sin(theta) * np.cos(phi)
+        dz = np.sin(theta) * np.sin(phi)
+
+        return np.array([dx, dy, dz])
+    
+    def _dist_vel_driection_truncnorm_cone(self,loc=None,scale=None):
+        # truncated normal distribution for theta within [0, alpha]
+        alpha_rad = np.deg2rad(self.alpha)
+        mu = alpha_rad / 2  if loc is None else loc  # mean at half the cone angle
+        sigma = alpha_rad / 6  if scale is None else scale  # standard deviation
+
+        a, b = (0 - mu) / sigma, (alpha_rad - mu) / sigma
+        theta = stats.truncnorm.rvs(a, b, loc=mu, scale=sigma)
+
+        # phi uniforme dans [0, 2pi]
         phi = 2 * np.pi * np.random.rand()
 
         # direction dans repère x-y-z
         dx = np.cos(theta)
         dy = np.sin(theta) * np.cos(phi)
         dz = np.sin(theta) * np.sin(phi)
+
         return np.array([dx, dy, dz])
 
-    def _build_velocity_direction_distribution(self , vel_dir_dist_type, vel_dir_dist_params):
+
+    def _build_velocity_direction_distribution(self , vel_dir_dist_type, vel_dir_dist_params=None):
         if vel_dir_dist_type == 'uniform_cone':
             # return a sampler (callable) that draws one direction when called
             return self._dist_vel_direction_uniform_cone
+        elif vel_dir_dist_type == 'truncnorm_cone':
+            if vel_dir_dist_params is None:
+                return self._dist_vel_driection_truncnorm_cone
+            else:
+                return lambda: self._dist_vel_driection_truncnorm_cone(loc=vel_dir_dist_params.get('loc'), scale=vel_dir_dist_params.get('scale'))
         else:
             raise ValueError(f"Distribution angulaire inconnue : {vel_dir_dist_type}")
     
@@ -160,8 +187,8 @@ class GeneratorCircle:
             # If any sampling fails, do not change timers and return None
             return None
 
-        # successful emission: consume the scheduled delay and schedule the next one
-        self.time_since_last_emit -= self._next_emit_delay
+        # successful emission: reset timer and schedule next emit
+        self.time_since_last_emit = 0.0
         if self.emit_distribution is None:
             self._next_emit_delay = float(self.constant_emit_delay)
         else:

@@ -21,6 +21,11 @@ class Particle:
         self.detection_position = None  # Position at detection.
         self.detection_velocity = None  # Velocity at detection.
         self.detection_duration  = 0.0  # Duration of detection.
+        # Other properties can be added as needed.
+        self.emission_time = None  # Time of emission.
+
+    def __eq__(self, other):
+        return self.id == other.id
 
     def update(self, dt):
         # --- update position ---

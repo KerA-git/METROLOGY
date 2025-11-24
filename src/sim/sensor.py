@@ -22,9 +22,9 @@ class RectangularSensor:
         self.dimensions = np.array(dimensions, float)  # (width, depth, height)
         self.fs = fs  # sampling frequency
     
-    def get_range_detect_bounds(self) -> Tuple[np.ndarray , np.ndarray]:
+    def get_range_detect_bounds(self) -> np.ndarray:
         """Returns the max corners of the sensor detection volume according to the basis (x,y,z) and not the local sensor frame."""
-        return self.position + max(self.dimensions)
+        return self.position + self.dimensions[np.newaxis, :] / 2.0
 
     # update on particle array ------------------------------------------------------------------------------------------------
 
