@@ -15,6 +15,7 @@ def run(
     run_duration = 10.0,  # simu duration (s) [real time]
     visualize = False,  # visualize simulation
     visual_slowdown: float = 0.02,  # seconds pause per frame for visualization
+    is_progressive: bool = True,  # show progress bar
     **params
     ) -> Tuple[List[Particle], int]:
     """
@@ -52,16 +53,18 @@ def run(
     detected_particles :List[Particle] = []
 
     # Main simulation loop -----------------------------------------------------------------------------------
-    print(f"Starting simulation with {total_steps} steps...")
+    if is_progressive:
+        print(f"Starting simulation with {total_steps} steps...")
 
     if not visualize:
         for step in range(total_steps):
-            percent = (step + 1) / total_steps
-            bar_length = 30
-            filled = int(percent * bar_length)
+            if is_progressive:
+                percent = (step + 1) / total_steps
+                bar_length = 30
+                filled = int(percent * bar_length)
 
-            bar = "█" * filled + "-" * (bar_length - filled)
-            print(f"\rProgress: |{bar}| {percent*100:5.1f}%. Current living particles: {len(living_particles)} Timing : {t} s", end="")
+                bar = "█" * filled + "-" * (bar_length - filled)
+                print(f"\rProgress: |{bar}| {percent*100:5.1f}%. Current living particles: {len(living_particles)} Timing : {t} s", end="")
             # --- Update generator ---
             new_particle = generator(dt) #emit new particle or None
             if new_particle:
@@ -134,12 +137,13 @@ def run(
         plt.legend()
         # Main loop -----------------------------------------------------------------------------------
         for step in range(total_steps):
-            ## progress bar :
-            percent = (step + 1) / total_steps
-            bar_length = 30
-            filled = int(percent * bar_length)
-            bar = "█" * filled + "-" * (bar_length - filled)
-            print(f"\rProgress: |{bar}| {percent*100:5.1f}%. Current living particles: {len(living_particles)}. Timing : {t:.2f} s", end="")
+            if is_progressive:
+                ## progress bar :
+                percent = (step + 1) / total_steps
+                bar_length = 30
+                filled = int(percent * bar_length)
+                bar = "█" * filled + "-" * (bar_length - filled)
+                print(f"\rProgress: |{bar}| {percent*100:5.1f}%. Current living particles: {len(living_particles)}. Timing : {t:.2f} s", end="")
             # --- Update generator ---
             new_particle = generator(dt)
             if new_particle:
@@ -203,10 +207,11 @@ def run(
         else:
             if particle.id not in lost_particles:
                 lost_particles.append(particle.id)
-    print("")  # new line after progress bar
-    print(f"\nSimulation finished.Max particules encountered: {Particle.id_counter},\n Lost particles: {len(lost_particles)},\n Detected particles: {len(detected_particles)}")
-    #print(f"detected IDs: {[p.id for p in detected_particles]}")
-    #print(f"lost IDs: {lost_particles}")
+    if is_progressive:
+        print("")  # new line after progress bar
+        print(f"\nSimulation finished.Max particules encountered: {Particle.id_counter},\n Lost particles: {len(lost_particles)},\n Detected particles: {len(detected_particles)}")
+        #print(f"detected IDs: {[p.id for p in detected_particles]}")
+        #print(f"lost IDs: {lost_particles}")
     return detected_particles, lost_particles
 
 
